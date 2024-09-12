@@ -9,7 +9,7 @@ This tool uses Python AWS SKD, so it doesn't have this limitation as well as it 
 
 1. Parallel upload (up to 10 threads)
 2. Deep archive ([pricing](https://aws.amazon.com/s3/pricing/))
-3. Unarchive (request restoration from Deep Archive/Glacier and copy to the restoration is done)
+3. Unarchive (request restoration from Deep Archive/Glacier and copy when the restoration is done)
 4. Cross-account copy (no need to download entire archive to local when moving to a new AWS account)
 
 ## Setup
