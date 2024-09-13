@@ -45,21 +45,21 @@ def count_remaining_and_request_restores(s3_rsrc, bucket, s3objects):
     not_glacier_count = 0
     logging.info('Checking storage class for the requested objects')
     logging.info('Objects in Glacier or Deep Archive need to be restored before they can be copied')
-    logging.info('Legend: 📦 ready to copy    📼 requesting restore    📤 restoring    ✅ restored')
+    logging.info('Legend: 📦 ready to copy    🤙 requesting restore    📼 restoring    🪆 restored')
     for s3object in s3objects:
         obj = s3_rsrc.Object(bucket, s3object['Key'])
         if obj.storage_class == 'GLACIER' or obj.storage_class == 'DEEP_ARCHIVE':
             if obj.restore is None:
                 obj.restore_object(RestoreRequest={'Days': RESTORE_DAYS, 'GlacierJobParameters': {'Tier': TIER}})
                 just_requested_count = just_requested_count + 1
-                print('📼', end='')
+                print('🤙', end='')
                 sys.stdout.flush()
             elif 'ongoing-request="true"' in obj.restore:
-                print('📤', end='')
+                print('📼', end='')
                 sys.stdout.flush()
                 pending_count = pending_count + 1
             elif 'ongoing-request="false"' in obj.restore:
-                print('✅', end='')
+                print('🪆', end='')
                 sys.stdout.flush()
                 restored_count = restored_count + 1
         else:
@@ -68,9 +68,9 @@ def count_remaining_and_request_restores(s3_rsrc, bucket, s3objects):
             not_glacier_count = not_glacier_count + 1
     print('')
     logging.info('📦 Ready to copy:      ' + str(not_glacier_count))
-    logging.info('📼 Requesting restore: ' + str(just_requested_count))
-    logging.info('📤 Restoring:          ' + str(pending_count))
-    logging.info('✅ Restored:           ' + str(restored_count))
+    logging.info('🤙 Requesting restore: ' + str(just_requested_count))
+    logging.info('📼 Restoring:          ' + str(pending_count))
+    logging.info('🪆 Restored:           ' + str(restored_count))
     return pending_count + just_requested_count
 
 
@@ -78,7 +78,7 @@ def copy_s3object(source_client, source_bucket, dest_bucket, s3object):
     sys.stdout.flush()
     source_client.copy(CopySource={'Bucket': source_bucket, 'Key': s3object['Key']}, Bucket=dest_bucket,
                             Key=s3object['Key'])
-    print('📥', end='')
+    print('💾', end='')
 
 
 def copy_s3objects(source_client, source_bucket, dest_bucket, s3objects):
