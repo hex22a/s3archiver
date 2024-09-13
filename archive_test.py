@@ -33,7 +33,7 @@ class TestArchive(unittest.TestCase):
         expected_prefix = 'archive/2024'
         expected_args = [expected_script_name, expected_local_path, expected_s3_bucket, expected_prefix]
         expected_exit_code = 0
-        expected_log_format = '%(levelname)s: %(asctime)s: %(message)s'
+        expected_log_format = archive.LOG_FORMAT
 
         expected_put_file_calls = [
             call(expected_file_path_1, expected_s3_bucket, expected_filename_1, expected_prefix),
@@ -71,7 +71,7 @@ class TestArchive(unittest.TestCase):
         expected_prefix = ''
         expected_args = [expected_script_name, expected_local_path, expected_s3_bucket]
         expected_exit_code = 0
-        expected_log_format = '%(levelname)s: %(asctime)s: %(message)s'
+        expected_log_format = archive.LOG_FORMAT
 
         expected_put_file_calls = [
             call(expected_file_path_1, expected_s3_bucket, expected_filename_1, expected_prefix),
