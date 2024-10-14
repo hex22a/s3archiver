@@ -1,6 +1,7 @@
 import logging
 import sys
 import time
+from argparse import ArgumentParser
 from functools import partial
 from multiprocessing.pool import ThreadPool
 
@@ -74,24 +75,45 @@ def count_remaining_and_request_restores(s3_rsrc, bucket, s3objects):
     return pending_count + just_requested_count
 
 
-def copy_s3object(source_client, source_bucket, dest_bucket, s3object):
+def copy_s3object(source_client, source_bucket, dest_bucket, copy_to_glacier, s3object):
     sys.stdout.flush()
-    source_client.copy(CopySource={'Bucket': source_bucket, 'Key': s3object['Key']}, Bucket=dest_bucket,
-                            Key=s3object['Key'])
+    extra_args = None
+    if copy_to_glacier:
+        extra_args = {'StorageClass': 'GLACIER'}
+    source_client.copy(
+        CopySource={'Bucket': source_bucket, 'Key': s3object['Key']},
+        Bucket=dest_bucket,
+        Key=s3object['Key'],
+        ExtraArgs=extra_args
+    )
     print('💾', end='')
 
 
-def copy_s3objects(source_client, source_bucket, dest_bucket, s3objects):
+def copy_s3objects(source_client, source_bucket, dest_bucket, s3objects, copy_to_glacier):
     pool = ThreadPool(processes=NUMBER_OF_COPY_THREADS)
-    pool.map(partial(copy_s3object, source_client, source_bucket, dest_bucket), s3objects)
+    pool.map(partial(copy_s3object, source_client, source_bucket, dest_bucket, copy_to_glacier), s3objects)
     print('')
 
 
 def main():
     logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
 
-    source_bucket = sys.argv[1]
-    destination_bucket = sys.argv[2]
+    parser = ArgumentParser(
+        description='A tool that helps organizing S3 archives',
+        epilog='Have a nice day!'
+    )
+
+    parser.add_argument('source_bucket')
+    parser.add_argument('destination_bucket')
+    parser.add_argument('-f', '--fast-access', action='store_true', help="don't use StorageClass=GLACIER, instead use default StorageClass. Read more about Amazon S3 Storage Classes: https://aws.amazon.com/s3/storage-classes/")
+
+    parser.print_usage()
+
+    args = parser.parse_args()
+
+    source_bucket = args.source_bucket
+    destination_bucket = args.destination_bucket
+    copy_to_glacier = not args.fast_access
 
     botocore_config = botocore.config.Config(max_pool_connections=MAX_POOL_CONNECTIONS)
     destination_client = boto3.client(S3_SERVICE_NAME, config=botocore_config)
@@ -117,7 +139,7 @@ def main():
         time.sleep(POLLING_INTERVAL_SECONDS)
 
     logging.info('Copying objects from ' + source_bucket + ' to ' + destination_bucket)
-    copy_s3objects(source_client, source_bucket, destination_bucket, s3objects)
+    copy_s3objects(source_client, source_bucket, destination_bucket, s3objects, copy_to_glacier)
     logging.info('Objects copied.')
     logging.info('Restoration complete.')
 
