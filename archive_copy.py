@@ -8,6 +8,8 @@ from multiprocessing.pool import ThreadPool
 import boto3
 import botocore
 
+PROGRAM_DESCRIPTION = 'A tool that helps organizing S3 archives'
+PROGRAM_EPILOGUE = 'Have a nice day!'
 S3_SERVICE_NAME = 's3'
 LOG_FORMAT = '%(levelname)s: %(asctime)s: %(message)s'
 MAX_POOL_CONNECTIONS = 100
@@ -17,6 +19,9 @@ RESTORE_DAYS = 7
 POLLING_INTERVAL_SECONDS = 300
 TIER = 'Standard'
 LOG_LEVEL = logging.INFO
+FAST_ACCESS_FLAG_HELP_MESSAGE = ("don't use StorageClass=GLACIER, instead use StorageClass=STANDARD for faster access. "
+                                 "Read more about Amazon S3 Storage Classes: "
+                                 "https://aws.amazon.com/s3/storage-classes/")
 
 
 def bucket_exists(s3_bucket, bucket_name):
@@ -99,13 +104,13 @@ def main():
     logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
 
     parser = ArgumentParser(
-        description='A tool that helps organizing S3 archives',
-        epilog='Have a nice day!'
+        description=PROGRAM_DESCRIPTION,
+        epilog=PROGRAM_EPILOGUE
     )
 
     parser.add_argument('source_bucket')
     parser.add_argument('destination_bucket')
-    parser.add_argument('-f', '--fast-access', action='store_true', help="don't use StorageClass=GLACIER, instead use default StorageClass. Read more about Amazon S3 Storage Classes: https://aws.amazon.com/s3/storage-classes/")
+    parser.add_argument('-f', '--fast-access', action='store_true', help=FAST_ACCESS_FLAG_HELP_MESSAGE)
 
     parser.print_usage()
 

@@ -1,5 +1,4 @@
 import unittest
-import sys
 from argparse import Namespace
 from unittest.mock import patch, call
 
@@ -31,13 +30,13 @@ class TestArchiveCopy(unittest.TestCase):
             mock_argument_parser
     ):
         # Arrange
-        expected_description = 'A tool that helps organizing S3 archives'
-        expected_epilogue = 'Have a nice day!'
+        expected_description = archive_copy.PROGRAM_DESCRIPTION
+        expected_epilogue = archive_copy.PROGRAM_EPILOGUE
         expected_positional_argument_source_bucket = 'source_bucket'
         expected_positional_argument_destination_bucket = 'destination_bucket'
         expected_fast_access_flag_short = '-f'
         expected_fast_access_flag_full = '--fast-access'
-        expected_fast_access_flag_help = "don't use StorageClass=GLACIER, instead use default StorageClass. Read more about Amazon S3 Storage Classes: https://aws.amazon.com/s3/storage-classes/"
+        expected_fast_access_flag_help = archive_copy.FAST_ACCESS_FLAG_HELP_MESSAGE
 
         expected_s3_objects = ['file1.csv', 'file2.csv']
         expected_source_bucket = 'my-old-archives'
@@ -113,13 +112,13 @@ class TestArchiveCopy(unittest.TestCase):
             mock_argument_parser
     ):
         # Arrange
-        expected_description = 'A tool that helps organizing S3 archives'
-        expected_epilogue = 'Have a nice day!'
+        expected_description = archive_copy.PROGRAM_DESCRIPTION
+        expected_epilogue = archive_copy.PROGRAM_EPILOGUE
         expected_positional_argument_source_bucket = 'source_bucket'
         expected_positional_argument_destination_bucket = 'destination_bucket'
         expected_fast_access_flag_short = '-f'
         expected_fast_access_flag_full = '--fast-access'
-        expected_fast_access_flag_help = "don't use StorageClass=GLACIER, instead use default StorageClass. Read more about Amazon S3 Storage Classes: https://aws.amazon.com/s3/storage-classes/"
+        expected_fast_access_flag_help = archive_copy.FAST_ACCESS_FLAG_HELP_MESSAGE
         expected_s3_objects = ['file1.csv', 'file2.csv']
         expected_source_bucket = 'my-old-archives'
         expected_destination_bucket = 'my-new-archives'
