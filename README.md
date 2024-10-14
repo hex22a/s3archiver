@@ -208,5 +208,5 @@ Where `<folder>` is a path to your files on your local machine, `<bucket>` is an
 
 ```bash
 # Scenario 2
- pipenv run python ./archive_copy.py <source_s3_bucket> <destination_s3_bucket>
+pipenv run python ./archive_copy.py [-h] [-f] <source_s3_bucket> <destination_s3_bucket>
 ```
